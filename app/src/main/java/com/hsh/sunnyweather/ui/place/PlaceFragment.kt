@@ -1,5 +1,6 @@
 package com.hsh.sunnyweather.ui.place
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.hsh.sunnyweather.R
 import com.hsh.sunnyweather.databinding.FragmentPlaceBinding
+import com.hsh.sunnyweather.ui.weather.WeatherActivity
 
 class PlaceFragment : Fragment() {
 
@@ -35,6 +37,18 @@ class PlaceFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
+        if(activity is MainActivity && viewModel.isPlaceSaved()){
+            if(viewModel.isPlaceSaved()){
+                val place=viewModel.getSavedPlace()
+                val intent = Intent(this.context,WeatherActivity::class.java).apply {
+                    putExtra("location_lng",place.location.lng)
+                    putExtra("location_lat",place.location.lat)
+                    putExtra("place_name",place.name)
+                }
+                startActivity(intent)
+                activity?.finish()
+            }
+        }
 
         val layoutManager = LinearLayoutManager(activity)
 
@@ -57,6 +71,7 @@ class PlaceFragment : Fragment() {
         }
 
         viewModel.placeLiveData.observe(viewLifecycleOwner, Observer{ result ->
+            val a = viewModel.placeLiveData
             val places = result.getOrNull()
             if (places != null) {
                 binding.recyclerView.visibility = View.VISIBLE
